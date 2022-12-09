@@ -1,26 +1,20 @@
-use std::{fs::File, io::Read};
-
 use font_kit::{
-    family_name::FamilyName, handle::Handle, hinting::HintingOptions, outline::OutlineSink,
-    properties::Properties, source::SystemSource,
+    family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use pathfinder_geometry::{line_segment::LineSegment2F, vector::Vector2F};
 use rusttype::{Font, IntoGlyphId, OutlineBuilder, Scale};
+use std::{fs::File, io::Read};
 use svg::node::element::Path;
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
 
 pub fn f() -> Path {
     let handle = SystemSource::new()
         .select_best_match(&[FamilyName::SansSerif], &Properties::new())
         .unwrap();
+
     let font = match handle {
         Handle::Path { path, font_index } => {
             let mut file = File::open(path).unwrap();
             let mut buf = Vec::new();
-            file.read_to_end(&mut buf);
+            file.read_to_end(&mut buf).unwrap();
             Font::try_from_vec_and_index(buf, font_index).unwrap()
         }
         Handle::Memory { bytes, font_index } => {
