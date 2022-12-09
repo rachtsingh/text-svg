@@ -1,51 +1,41 @@
-use font_kit::{
-    family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
-};
-use rusttype::{Font, IntoGlyphId, OutlineBuilder, Scale};
-use std::{fs::File, io::Read};
+use rusttype::{Font, IntoGlyphId, OutlineBuilder, Rect, Scale, ScaledGlyph};
 use svg::node::element::Path;
 
-pub fn f() -> Path {
-    let handle = SystemSource::new()
-        .select_best_match(&[FamilyName::SansSerif], &Properties::new())
-        .unwrap();
-
-    let font = match handle {
-        Handle::Path { path, font_index } => {
-            let mut file = File::open(path).unwrap();
-            let mut buf = Vec::new();
-            file.read_to_end(&mut buf).unwrap();
-            Font::try_from_vec_and_index(buf, font_index).unwrap()
-        }
-        Handle::Memory { bytes, font_index } => {
-            Font::try_from_vec_and_index(bytes.to_vec(), font_index).unwrap()
-        }
-    };
-
-    let builder = Builder::new(&font, 'A', 20.);
-
-    Path::new().set("d", builder.d).set("fill", "#000")
+pub struct Glpyh<'font> {
+    pub scaled: ScaledGlyph<'font>,
+    pub bounding_box: Rect<f32>,
 }
 
-#[derive(Default)]
+impl<'font> Glpyh<'font> {
+    pub fn new(font: &'font Font, id: impl IntoGlyphId, size: f32) -> Self {
+        let scaled = font.glyph(id).scaled(Scale::uniform(size));
+        let bounding_box = scaled.exact_bounding_box().unwrap();
+        Self {
+            scaled,
+            bounding_box,
+        }
+    }
+
+    pub fn into_path(self) -> Path {
+        let mut builder = Builder::new(-self.bounding_box.min.x, -self.bounding_box.min.y);
+        self.scaled.build_outline(&mut builder);
+        Path::new().set("d", builder.d).set("fill", "#000")
+    }
+}
+
 pub struct Builder {
-    x: f32,
-    y: f32,
-    d: String,
+    pub x: f32,
+    pub y: f32,
+    pub d: String,
 }
 
 impl Builder {
-    pub fn new(font: &Font, id: impl IntoGlyphId, size: f32) -> Self {
-        let scaled = font.glyph(id).scaled(Scale::uniform(size));
-        let bounds = scaled.exact_bounding_box().unwrap();
-
-        let mut builder = Self {
-            x: -bounds.min.x,
-            y: -bounds.min.y,
+    pub fn new(x: f32, y: f32) -> Self {
+        Self {
+            x,
+            y,
             d: String::new(),
-        };
-        scaled.build_outline(&mut builder);
-        builder
+        }
     }
 }
 
@@ -88,14 +78,35 @@ impl OutlineBuilder for Builder {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use font_kit::{
+        family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
+    };
+    use std::{fs::File, io::Read};
     use svg::Document;
 
     #[test]
     fn it_works() {
+        let handle = SystemSource::new()
+            .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+            .unwrap();
+
+        let font = match handle {
+            Handle::Path { path, font_index } => {
+                let mut file = File::open(path).unwrap();
+                let mut buf = Vec::new();
+                file.read_to_end(&mut buf).unwrap();
+                Font::try_from_vec_and_index(buf, font_index).unwrap()
+            }
+            Handle::Memory { bytes, font_index } => {
+                Font::try_from_vec_and_index(bytes.to_vec(), font_index).unwrap()
+            }
+        };
+
+        let glyph = Glpyh::new(&font, 'A', 20.);
         let document = Document::new()
             .set("width", 1000)
             .set("height", 1000)
-            .add(f());
-        svg::save("image.svg", &document);
+            .add(glyph.into_path());
+        svg::save("image.svg", &document).unwrap();
     }
 }
