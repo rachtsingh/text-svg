@@ -3,6 +3,9 @@ name = "font-svg"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "font_svg"
+
 [dependencies]
 font-kit = "0.11.0"
 rusttype = "0.9.3"

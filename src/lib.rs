@@ -74,39 +74,3 @@ impl OutlineBuilder for Builder {
         self.d.push('Z');
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use font_kit::{
-        family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
-    };
-    use std::{fs::File, io::Read};
-    use svg::Document;
-
-    #[test]
-    fn it_works() {
-        let handle = SystemSource::new()
-            .select_best_match(&[FamilyName::SansSerif], &Properties::new())
-            .unwrap();
-
-        let font = match handle {
-            Handle::Path { path, font_index } => {
-                let mut file = File::open(path).unwrap();
-                let mut buf = Vec::new();
-                file.read_to_end(&mut buf).unwrap();
-                Font::try_from_vec_and_index(buf, font_index).unwrap()
-            }
-            Handle::Memory { bytes, font_index } => {
-                Font::try_from_vec_and_index(bytes.to_vec(), font_index).unwrap()
-            }
-        };
-
-        let glyph = Glpyh::new(&font, 'A', 20.);
-        let document = Document::new()
-            .set("width", 100)
-            .set("height", 100)
-            .add(glyph.into_path());
-        svg::save("image.svg", &document).unwrap();
-    }
-}
