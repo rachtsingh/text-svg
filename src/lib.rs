@@ -104,8 +104,8 @@ mod tests {
 
         let glyph = Glpyh::new(&font, 'A', 20.);
         let document = Document::new()
-            .set("width", 1000)
-            .set("height", 1000)
+            .set("width", 100)
+            .set("height", 100)
             .add(glyph.into_path());
         svg::save("image.svg", &document).unwrap();
     }
