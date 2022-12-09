@@ -5,7 +5,7 @@ use font_kit::{
     properties::Properties, source::SystemSource,
 };
 use pathfinder_geometry::{line_segment::LineSegment2F, vector::Vector2F};
-use rusttype::{Font, OutlineBuilder, Scale};
+use rusttype::{Font, IntoGlyphId, OutlineBuilder, Scale};
 use svg::node::element::Path;
 
 pub fn add(left: usize, right: usize) -> usize {
@@ -28,14 +28,7 @@ pub fn f() -> Path {
         }
     };
 
-    let mut builder = Builder {
-        x: 100.,
-        y: 100.,
-        d: String::new(),
-    };
-    font.glyph('A')
-        .scaled(Scale::uniform(20.))
-        .build_outline(&mut builder);
+    let builder = Builder::new(&font, 'A', 20.);
 
     Path::new().set("d", builder.d).set("fill", "#000")
 }
@@ -45,6 +38,21 @@ pub struct Builder {
     x: f32,
     y: f32,
     d: String,
+}
+
+impl Builder {
+    pub fn new(font: &Font, id: impl IntoGlyphId, size: f32) -> Self {
+        let scaled = font.glyph(id).scaled(Scale::uniform(size));
+        let bounds = scaled.exact_bounding_box().unwrap();
+
+        let mut builder = Self {
+            x: -bounds.min.x,
+            y: -bounds.min.y,
+            d: String::new(),
+        };
+        scaled.build_outline(&mut builder);
+        builder
+    }
 }
 
 impl OutlineBuilder for Builder {
