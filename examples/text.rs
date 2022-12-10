@@ -26,10 +26,10 @@ fn main() {
     let x = 10.;
     let y = 20.;
 
-    let mut builder = Text::builder();
-    builder.size = 50.0;
-    builder.start = Point { x, y };
-    let text = builder.build(&font, "text-svg");
+    let text = Text::builder()
+        .size(50.0)
+        .start(Point { x, y })
+        .build(&font, "text-svg");
 
     let document = Document::new()
         .set("width", text.bounding_box.max.x + x)

@@ -35,6 +35,16 @@ impl Default for Builder<'static> {
 }
 
 impl Builder<'_> {
+    pub fn size(mut self, size: f32) -> Self {
+        self.size = size;
+        self
+    }
+
+    pub fn start(mut self, start: Point<f32>) -> Self {
+        self.start = start;
+        self
+    }
+
     pub fn build(&self, font: &Font, text: &str) -> Text {
         let mut d = String::new();
         let mut x = self.start.x;
