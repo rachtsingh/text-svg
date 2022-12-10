@@ -1,7 +1,7 @@
 use font_kit::{
     family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use font_svg::text;
+use text_svg::text;
 use rusttype::{Font, Point};
 use std::{fs::File, io::Read};
 use svg::Document;
