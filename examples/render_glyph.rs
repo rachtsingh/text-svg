@@ -25,9 +25,9 @@ fn main() {
 
     let glyph = Glpyh::new(&font, 'F', 20.);
     let document = Document::new()
-        .set("width", glyph.bounding_box.width())
-        .set("height", glyph.bounding_box.height())
-        .add(glyph.into_path());
+        .set("width", 10. + glyph.bounding_box.width())
+        .set("height", 10. + glyph.bounding_box.height())
+        .add(glyph.into_path(10., 10.));
 
     svg::save("image.svg", &document).unwrap();
 }

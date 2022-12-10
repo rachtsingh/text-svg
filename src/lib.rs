@@ -16,30 +16,31 @@ impl<'font> Glpyh<'font> {
         }
     }
 
-    pub fn into_path(self) -> Path {
-        let mut builder = Builder::new(-self.bounding_box.min.x, -self.bounding_box.min.y);
+    pub fn write_path(self, x: f32, y: f32, d: &mut String) {
+        let mut builder = Builder::new(x - self.bounding_box.min.x, y - self.bounding_box.min.y, d);
         self.scaled.build_outline(&mut builder);
-        Path::new().set("d", builder.d).set("fill", "#000")
+    }
+
+    pub fn into_path(self, x: f32, y: f32) -> Path {
+        let mut d = String::new();
+        self.write_path(x, y, &mut d);
+        Path::new().set("d", d).set("fill", "#000")
     }
 }
 
-pub struct Builder {
+pub struct Builder<'a> {
     pub x: f32,
     pub y: f32,
-    pub d: String,
+    pub d: &'a mut String,
 }
 
-impl Builder {
-    pub fn new(x: f32, y: f32) -> Self {
-        Self {
-            x,
-            y,
-            d: String::new(),
-        }
+impl<'a> Builder<'a> {
+    pub fn new(x: f32, y: f32, d: &'a mut String) -> Self {
+        Self { x, y, d }
     }
 }
 
-impl OutlineBuilder for Builder {
+impl OutlineBuilder for Builder<'_> {
     fn move_to(&mut self, x: f32, y: f32) {
         self.d.push_str(&format!("M{} {}", x + self.x, y + self.y));
     }
