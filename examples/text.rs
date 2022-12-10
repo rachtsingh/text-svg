@@ -1,8 +1,8 @@
 use font_kit::{
     family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use font_svg::Glpyh;
-use rusttype::Font;
+use font_svg::text;
+use rusttype::{Font, Point};
 use std::{fs::File, io::Read};
 use svg::Document;
 
@@ -23,11 +23,12 @@ fn main() {
         }
     };
 
-    let glyph = Glpyh::new(&font, 'F', 20.);
+    let path = text(&font, "FontSvg", 20., Point { x: 10., y: 10. }, 2.);
+
     let document = Document::new()
-        .set("width", 10. + glyph.bounding_box.width())
-        .set("height", 10. + glyph.bounding_box.height())
-        .add(glyph.into_path(10., 10.));
+        .set("width", 200.)
+        .set("height", 200.)
+        .add(path);
 
     svg::save("image.svg", &document).unwrap();
 }
