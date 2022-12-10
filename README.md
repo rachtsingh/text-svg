@@ -1,7 +1,7 @@
-# font-svg
-Font -> SVG in rust
+# text-svg
+Text -> SVG in rust
 
-![example](https://raw.githubusercontent.com/matthunz/font-svg/main/image.svg)
+![example](https://raw.githubusercontent.com/matthunz/text-svg/main/image.svg)
 
-[Examples](https://github.com/matthunz/font-svg/tree/main/examples)
+[Examples](https://github.com/matthunz/text-svg/tree/main/examples)
 

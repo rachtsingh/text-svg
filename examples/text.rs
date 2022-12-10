@@ -1,10 +1,10 @@
 use font_kit::{
     family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use text_svg::text;
 use rusttype::{Font, Point};
 use std::{fs::File, io::Read};
-use svg::Document;
+use svg::{node::element::Rectangle, Document};
+use text_svg::text;
 
 fn main() {
     let handle = SystemSource::new()
@@ -23,11 +23,24 @@ fn main() {
         }
     };
 
-    let path = text(&font, "FontSvg", 20., Point { x: 10., y: 10. }, 2.);
+    let x = 10.;
+    let y = 5.;
+    let width = 200.;
+    let height = 60.;
+
+    let path = text(&font, "FontSvg", 50., Point { x, y }, 2.);
 
     let document = Document::new()
-        .set("width", 200.)
-        .set("height", 200.)
+        .set("width", width)
+        .set("height", height)
+        .add(
+            Rectangle::new()
+                .set("fill", "#fff")
+                .set("x", 0.)
+                .set("y", 0.)
+                .set("width", width)
+                .set("height", height),
+        )
         .add(path);
 
     svg::save("image.svg", &document).unwrap();

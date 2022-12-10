@@ -1,10 +1,10 @@
 use font_kit::{
     family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use text_svg::Glpyh;
 use rusttype::Font;
 use std::{fs::File, io::Read};
 use svg::Document;
+use text_svg::Glpyh;
 
 fn main() {
     let handle = SystemSource::new()
