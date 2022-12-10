@@ -1,20 +1,44 @@
 use rusttype::{Font, IntoGlyphId, OutlineBuilder, Point, Rect, Scale, ScaledGlyph};
 use svg::node::element::Path;
 
-pub fn text(font: &Font, s: &str, size: f32, start: Point<f32>, letter_spacing: f32) -> Path {
+pub fn text(
+    font: &Font,
+    s: &str,
+    size: f32,
+    start: Point<f32>,
+    letter_spacing: f32,
+) -> (Path, Point<f32>) {
     let mut d = String::new();
     let mut x = start.x;
 
-    for glyph in font.layout(s, Scale::uniform(size), start) {
-        glyph.build_outline(&mut Builder {
+    let scale = Scale::uniform(size);
+    let v_metrics = font.v_metrics(scale);
+    let glyphs_height = v_metrics.ascent - v_metrics.descent;
+
+    for glyph in font.layout(
+        s,
+        scale,
+        Point {
             x,
-            y: start.y,
+            y: start.y + v_metrics.ascent,
+        },
+    ) {
+        let bounding_box = glyph.unpositioned().exact_bounding_box().unwrap();
+        glyph.build_outline(&mut Builder {
+            x: x + bounding_box.min.x,
+            y: glyphs_height + bounding_box.min.y,
             d: &mut d,
         });
-        x += glyph.unpositioned().exact_bounding_box().unwrap().width() + letter_spacing;
+        x += bounding_box.width() + letter_spacing;
     }
 
-    Path::new().set("d", d).set("fill", "#000")
+    (
+        Path::new().set("d", d).set("fill", "#000"),
+        Point {
+            x,
+            y: glyphs_height,
+        },
+    )
 }
 
 pub struct Glpyh<'font> {
@@ -58,27 +82,32 @@ impl<'a> Builder<'a> {
 
 impl OutlineBuilder for Builder<'_> {
     fn move_to(&mut self, x: f32, y: f32) {
-        self.d.push_str(&format!("M{} {}", x + self.x, y));
+        self.d.push_str(&format!("M{} {}", x + self.x, y + self.y));
     }
 
     fn line_to(&mut self, x: f32, y: f32) {
-        self.d.push_str(&format!("L{} {}", x + self.x, y));
+        self.d.push_str(&format!("L{} {}", x + self.x, y + self.y));
     }
 
     fn quad_to(&mut self, x1: f32, y1: f32, x: f32, y: f32) {
-        self.d
-            .push_str(&format!("Q{} {},{} {}", x1 + self.x, y1, x + self.x, y));
+        self.d.push_str(&format!(
+            "Q{} {},{} {}",
+            x1 + self.x,
+            y1 + self.y,
+            x + self.x,
+            y + self.y
+        ));
     }
 
     fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y: f32) {
         self.d.push_str(&format!(
             "C{} {},{} {},{} {}",
             x1 + self.x,
-            y1,
+            y1 + self.y,
             x2 + self.x,
-            y2,
+            y2 + self.y,
             x + self.x,
-            y
+            y + self.y
         ));
     }
 

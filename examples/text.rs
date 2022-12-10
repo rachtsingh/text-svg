@@ -8,7 +8,7 @@ use text_svg::text;
 
 fn main() {
     let handle = SystemSource::new()
-        .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+        .select_best_match(&[FamilyName::Serif], &Properties::new())
         .unwrap();
 
     let font = match handle {
@@ -24,22 +24,20 @@ fn main() {
     };
 
     let x = 10.;
-    let y = 5.;
-    let width = 200.;
-    let height = 60.;
+    let y = 20.;
 
-    let path = text(&font, "FontSvg", 50., Point { x, y }, 2.);
+    let (path, end) = text(&font, "font-svg", 50., Point { x, y }, 0.);
 
     let document = Document::new()
-        .set("width", width)
-        .set("height", height)
+        .set("width", end.x + x)
+        .set("height", end.y + y)
         .add(
             Rectangle::new()
                 .set("fill", "#fff")
                 .set("x", 0.)
                 .set("y", 0.)
-                .set("width", width)
-                .set("height", height),
+                .set("width", end.x + x)
+                .set("height", end.y + y),
         )
         .add(path);
 
