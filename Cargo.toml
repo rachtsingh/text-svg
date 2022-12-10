@@ -1,7 +1,9 @@
 [package]
 name = "text-svg"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
+repository = "https://github.com/staff-rs/staff"
+description = "Render text or glyphs in a font to an SVG path"
 
 [lib]
 name = "text_svg"
