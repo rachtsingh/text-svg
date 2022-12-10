@@ -26,7 +26,7 @@ fn main() {
     let x = 10.;
     let y = 20.;
 
-    let (path, end) = text(&font, "font-svg", 50., Point { x, y }, 0.);
+    let (path, end) = text(&font, "text-svg", 50., Point { x, y }, 0.);
 
     let document = Document::new()
         .set("width", end.x + x)
