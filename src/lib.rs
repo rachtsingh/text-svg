@@ -1,45 +1,8 @@
-use rusttype::{Font, IntoGlyphId, OutlineBuilder, Point, Rect, Scale, ScaledGlyph};
+use rusttype::{Font, IntoGlyphId, OutlineBuilder, Rect, Scale, ScaledGlyph};
 use svg::node::element::Path;
 
-pub fn text(
-    font: &Font,
-    s: &str,
-    size: f32,
-    start: Point<f32>,
-    letter_spacing: f32,
-) -> (Path, Point<f32>) {
-    let mut d = String::new();
-    let mut x = start.x;
-
-    let scale = Scale::uniform(size);
-    let v_metrics = font.v_metrics(scale);
-    let glyphs_height = v_metrics.ascent - v_metrics.descent;
-
-    for glyph in font.layout(
-        s,
-        scale,
-        Point {
-            x,
-            y: start.y + v_metrics.ascent,
-        },
-    ) {
-        let bounding_box = glyph.unpositioned().exact_bounding_box().unwrap();
-        glyph.build_outline(&mut Builder {
-            x: x + bounding_box.min.x,
-            y: glyphs_height + bounding_box.min.y,
-            d: &mut d,
-        });
-        x += bounding_box.width() + letter_spacing;
-    }
-
-    (
-        Path::new().set("d", d).set("fill", "#000"),
-        Point {
-            x,
-            y: glyphs_height,
-        },
-    )
-}
+pub mod text;
+pub use text::Text;
 
 pub struct Glyph<'font> {
     pub scaled: ScaledGlyph<'font>,

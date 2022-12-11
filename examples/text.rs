@@ -4,7 +4,7 @@ use font_kit::{
 use rusttype::{Font, Point};
 use std::{fs::File, io::Read};
 use svg::{node::element::Rectangle, Document};
-use text_svg::text;
+use text_svg::Text;
 
 fn main() {
     let handle = SystemSource::new()
@@ -26,20 +26,23 @@ fn main() {
     let x = 10.;
     let y = 20.;
 
-    let (path, end) = text(&font, "text-svg", 50., Point { x, y }, 0.);
+    let text = Text::builder()
+        .size(50.0)
+        .start(Point { x, y })
+        .build(&font, "text-svg");
 
     let document = Document::new()
-        .set("width", end.x + x)
-        .set("height", end.y + y)
+        .set("width", text.bounding_box.max.x + x)
+        .set("height", text.bounding_box.max.y + y)
         .add(
             Rectangle::new()
                 .set("fill", "#fff")
                 .set("x", 0.)
                 .set("y", 0.)
-                .set("width", end.x + x)
-                .set("height", end.y + y),
+                .set("width", text.bounding_box.max.x + x)
+                .set("height", text.bounding_box.max.y + y),
         )
-        .add(path);
+        .add(text.path);
 
     svg::save("image.svg", &document).unwrap();
 }
