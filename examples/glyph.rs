@@ -4,7 +4,7 @@ use font_kit::{
 use rusttype::Font;
 use std::{fs::File, io::Read};
 use svg::Document;
-use text_svg::Glpyh;
+use text_svg::Glyph;
 
 fn main() {
     let handle = SystemSource::new()
@@ -23,7 +23,7 @@ fn main() {
         }
     };
 
-    let glyph = Glpyh::new(&font, 'F', 20.);
+    let glyph = Glyph::new(&font, 'F', 20.);
     let document = Document::new()
         .set("width", 10. + glyph.bounding_box.width())
         .set("height", 10. + glyph.bounding_box.height())

@@ -41,12 +41,12 @@ pub fn text(
     )
 }
 
-pub struct Glpyh<'font> {
+pub struct Glyph<'font> {
     pub scaled: ScaledGlyph<'font>,
     pub bounding_box: Rect<f32>,
 }
 
-impl<'font> Glpyh<'font> {
+impl<'font> Glyph<'font> {
     pub fn new(font: &'font Font, id: impl IntoGlyphId, size: f32) -> Self {
         let scaled = font.glyph(id).scaled(Scale::uniform(size));
         let bounding_box = scaled.exact_bounding_box().unwrap();
