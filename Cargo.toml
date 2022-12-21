@@ -10,6 +10,5 @@ description = "Render text or glyphs in a font to an SVG path"
 name = "text_svg"
 
 [dependencies]
-font-kit = "0.11.0"
 rusttype = "0.9.3"
 svg = "0.12.1"
